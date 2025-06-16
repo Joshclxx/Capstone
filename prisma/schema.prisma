@@ -1,0 +1,57 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Admin {
+  id         BigInt   @id @default(autoincrement())
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  userId     String   @unique @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  User       User     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Student {
+  id                BigInt   @id @default(autoincrement())
+  section           String?  @db.VarChar
+  subject           String?  @db.VarChar
+  year              BigInt?
+  created_at        DateTime @default(now()) @db.Timestamptz(6)
+  emergency_contact String   @db.VarChar
+  userId            String   @unique @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  User              User     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Teacher {
+  id               BigInt   @id @default(autoincrement())
+  assigned_subject String   @db.VarChar
+  department       String   @db.VarChar
+  userId           String   @unique @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at       DateTime @default(now()) @db.Timestamptz(6)
+  User             User     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model User {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  firstname      String   @db.VarChar
+  middlename     String   @db.VarChar
+  lastname       String   @db.VarChar
+  suffix         String?  @db.VarChar
+  dob            DateTime @db.Date
+  address        String   @db.VarChar
+  contact_number String   @db.VarChar
+  email          String   @unique @db.VarChar
+  password       String   @db.VarChar
+  role           String   @db.VarChar
+  created_at     DateTime @default(now()) @db.Timestamptz(6)
+  Admin          Admin?
+  Student        Student?
+  Teacher        Teacher?
+}
