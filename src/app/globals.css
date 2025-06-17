@@ -32,6 +32,23 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-/* TEXTS STYLES */
-
 /* Title, Sub-Title, Description, Bold, Semi-Bold, */
+.title {
+  @apply text-3xl font-bold leading-tight;
+}
+
+.subtitle {
+  @apply text-xl font-semibold leading-snug;
+}
+
+.section-title {
+  @apply text-lg font-semibold leading-snug;
+}
+
+.description {
+  @apply text-base font-normal leading-normal;
+}
+
+.caption {
+  @apply text-sm font-light leading-snug;
+}

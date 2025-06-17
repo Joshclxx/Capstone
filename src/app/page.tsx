@@ -1,5 +1,25 @@
-import Image from "next/image";
+import React from "react";
 
-export default function Home() {
-  return <div className="font-bold">IIH LANG MALAKAS</div>;
-}
+const page = () => {
+  return (
+    <div>
+      <p className="title">
+        INTEGRATED INNOVATION AND HOSPITALITY COLLEGES, INC.
+      </p>
+      <p className="subtitle">
+        INTEGRATED INNOVATION AND HOSPITALITY COLLEGES, INC.
+      </p>
+      <p className="section-title">
+        INTEGRATED INNOVATION AND HOSPITALITY COLLEGES, INC.
+      </p>
+      <p className="description">
+        INTEGRATED INNOVATION AND HOSPITALITY COLLEGES, INC.
+      </p>
+      <p className="caption">
+        INTEGRATED INNOVATION AND HOSPITALITY COLLEGES, INC.
+      </p>
+    </div>
+  );
+};
+
+export default page;
