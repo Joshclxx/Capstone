@@ -1,5 +1,9 @@
 import { ApolloServer } from "@apollo/server";
 import { startServerAndCreateNextHandler } from "@as-integrations/next"
+import { typeDefs } from "@/app/graphql/typeDefs";
+import { resolvers } from "@/app/graphql/resolvers";
+import { context } from "@/app/lib/context";
+import { NextRequest } from "next/server";
 
 const server = new ApolloServer({
     typeDefs,
@@ -7,7 +11,13 @@ const server = new ApolloServer({
 })
 
 const handler = startServerAndCreateNextHandler(server, {
-    context: async (req) => context
+    context: async () => context //no auth for now
 })
 
-export {handler as GET, handler as POST}
+export async function GET(req: NextRequest){
+    return handler(req)
+}
+
+export async function POST(req: NextRequest){
+    return handler(req)
+}
