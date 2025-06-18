@@ -1,20 +1,23 @@
 import { ApolloServer } from "@apollo/server";
+import {ApolloServerPluginLandingPageLocalDefault} from '@apollo/server/plugin/landingPage/default'
 import { startServerAndCreateNextHandler } from "@as-integrations/next"
 import { typeDefs } from "@/app/graphql/typeDefs";
 import { resolvers } from "@/app/graphql/resolvers";
-import { context } from "@/app/lib/context";
+import { createContext, GraphQLContext } from "@/app/lib/context";
 import { NextRequest } from "next/server";
 
 const server = new ApolloServer({
     typeDefs,
-    resolvers
+    resolvers,
+    introspection: process.env.NODE_ENV !== 'production',
+    plugins: process.env.NODE_ENV === 'production' ? [ApolloServerPluginLandingPageLocalDefault()] : []
 })
 
-const handler = startServerAndCreateNextHandler(server, {
-    context: async () => context //no auth for now
+const handler = startServerAndCreateNextHandler<NextRequest, GraphQLContext>(server, {
+    context: async (req) => createContext(req)
 })
 
-export async function GET(req: NextRequest){
+export async function GET(req: NextRequest){ //NextRequest kapag app routing app/ && NextApiRequest kapag page router pages/
     return handler(req)
 }
 
