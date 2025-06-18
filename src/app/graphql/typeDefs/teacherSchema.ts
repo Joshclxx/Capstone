@@ -6,6 +6,10 @@ export const teacherTypeDefs = gql`
     department: String
   }
 
+  type Query{
+    _empty: String
+  }
+
   enum department {
     BSIS
     BSAIS
