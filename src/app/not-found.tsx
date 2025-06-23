@@ -1,5 +1,3 @@
-// app/not-found.tsx
-
 export default function NotFound() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-white text-center px-4">
@@ -11,12 +9,12 @@ export default function NotFound() {
         Sareh not sorry, ang page na hanap mo ay baka nasa BESTLINK wala sa IIH
         COLLEGE.
       </p>
-      <a
+      <link
         href="/"
         className="mt-6 inline-block px-6 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
       >
         Go Back Home
-      </a>
+      </link>
     </div>
   );
 }
