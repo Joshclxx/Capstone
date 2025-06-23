@@ -1,25 +1,91 @@
-import React from "react";
+"use client";
 
-const page = () => {
+import SectionContainer from "@/components/SectionContainer";
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+
+export default function LoginPage() {
+  const router = useRouter();
+  const [form, setForm] = useState({ username: "", password: "" });
+  const [error, setError] = useState("");
+
+  const users = [
+    { username: "admin", password: "admin123", role: "admin" },
+    { username: "teacher", password: "teacher123", role: "teacher" },
+    { username: "student", password: "student123", role: "student" },
+  ];
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const foundUser = users.find(
+      (user) =>
+        user.username === form.username && user.password === form.password
+    );
+
+    if (foundUser) {
+      router.push(`/${foundUser.role}`);
+    } else {
+      setError("Invalid username or password");
+    }
+  };
+
   return (
-    <div>
-      <p className="title">
-        INTEGRATED INNOVATION AND HOSPITALITY COLLEGES, INC.
-      </p>
-      <p className="subtitle">
-        INTEGRATED INNOVATION AND HOSPITALITY COLLEGES, INC.
-      </p>
-      <p className="section-title">
-        INTEGRATED INNOVATION AND HOSPITALITY COLLEGES, INC.
-      </p>
-      <p className="description">
-        INTEGRATED INNOVATION AND HOSPITALITY COLLEGES, INC.
-      </p>
-      <p className="caption">
-        INTEGRATED INNOVATION AND HOSPITALITY COLLEGES, INC.
-      </p>
-    </div>
-  );
-};
+    <SectionContainer background="mt-1 h-auto">
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="w-[632px] h-[580px] p-8 bg-white shadow-md shadow-text rounded-lg">
+          <h1 className="title mb-24 text-center">Login</h1>
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div>
+              <label className="block subtitle">Username</label>
+              <input
+                name="username"
+                placeholder="Enter username"
+                value={form.username}
+                onChange={handleChange}
+                className="mt-1 block w-full px-4 py-2 border border-[#CAD3DD] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
 
-export default page;
+            <div>
+              <label className="block subtitle">Password</label>
+              <input
+                name="password"
+                type="password"
+                placeholder="Enter password"
+                value={form.password}
+                onChange={handleChange}
+                className="mt-1 block w-full px-4 py-2 border border-[#CAD3DD] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            {error && (
+              <p className="text-red-500 text-sm text-center">{error}</p>
+            )}
+
+            <button
+              type="submit"
+              className="w-full bg-highlight2 description text-white py-2 px-4 rounded-md hover:bg-blue-700 transition"
+            >
+              Login
+            </button>
+
+            <div className="caption text-highlight1 text-center">
+              <em>forgot password?</em>
+            </div>
+
+            <div className="font-bold text-center mt-20">
+              Dont have an account?{" "}
+              <span className="description text-highlight2">
+                <em>Sign Up Now</em>
+              </span>
+            </div>
+          </form>
+        </div>
+      </div>
+    </SectionContainer>
+  );
+}
