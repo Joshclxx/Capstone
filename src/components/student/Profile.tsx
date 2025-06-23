@@ -26,10 +26,8 @@ const Profile = () => {
               </p>
             </div>
             <div className="mt-[72px] relative">
-              {/* Green header */}
               <div className="absolute top-0 left-0 w-full h-[95px] bg-secondary shadow-md shadow-white z-10 rounded-t-md" />
 
-              {/* Profile Image (left-aligned and overlapping) */}
               <div className="absolute top-[50px] left-[48px] z-20">
                 <div className="w-[115px] h-[115px] rounded-full overflow-hidden border-4 border-white shadow-md">
                   <img
@@ -40,9 +38,7 @@ const Profile = () => {
                 </div>
               </div>
 
-              {/* White container */}
               <div className="relative mt-[80px] w-full h-[304px] bg-white shadow-md shadow-text rounded-md z-0 px-6 py-6">
-                {/* Name & Course */}
                 <div className=" mt-[80px] mb-4">
                   <p className="subtitle">Joshua Colobong Paet</p>
                   <p className="text-sm text-gray-600">
@@ -50,7 +46,6 @@ const Profile = () => {
                   </p>
                 </div>
 
-                {/* Credentials */}
                 <div className="grid grid-cols-4 gap-4 mt-[48]">
                   <div className="flex flex-col">
                     <span className="mini-title">Email</span>
