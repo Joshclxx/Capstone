@@ -19,7 +19,6 @@
     "classnames": "^2.5.1",
     "framer-motion": "^12.18.1",
     "graphql": "^16.11.0",
-
     "next": "15.3.3",
     "prisma": "^6.9.0",
     "react": "^19.0.0",
