@@ -7,17 +7,16 @@ export const userTypeDefs = gql`
     middlename: String!       
     lastname: String!         
     suffix: String!         
-    dob: DateTime!            
+    dob: String!            
     address: String!
     contact_number: String!   
     email: String!      
     password: String!        
     role: Role!      
-    created_at: DateTime!
-    Admin: #Empty
-    Student: #Empty   
-    Teacher: #Empty for now
+    created_at: String!
+    Student: Student
   }
+
 
   enum Role {
     admin
