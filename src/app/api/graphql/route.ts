@@ -4,7 +4,7 @@ import { startServerAndCreateNextHandler } from "@as-integrations/next"
 import { typeDefs } from "@/app/graphql/typeDefs";
 import { resolvers } from "@/app/graphql/resolvers";
 import { createContext, GraphQLContext } from "@/app/lib/context";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 const server = new ApolloServer({
     typeDefs,
@@ -14,7 +14,10 @@ const server = new ApolloServer({
 })
 
 const handler = startServerAndCreateNextHandler<NextRequest, GraphQLContext>(server, {
-    context: async (req) => createContext(req)
+    context: async (req) => {
+        const res = new NextResponse()
+        return await createContext(req, res)
+    }
 })
 
 export async function GET(req: NextRequest){ //NextRequest kapag app routing app/ && NextApiRequest kapag page router pages/
