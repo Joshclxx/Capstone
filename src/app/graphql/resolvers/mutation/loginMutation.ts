@@ -1,36 +1,28 @@
 import { GraphQLContext } from "@/app/lib/context";
-import jwt from "jsonwebtoken"
+// import { GraphQLError } from "graphql";
+
 
 export const loginMutation = {
     Mutation: {
         login: async (_: unknown, args: {data: {email: string, password: string}}, context: GraphQLContext) => {
             const {email, password} = args.data;
 
-            const user = await context.prisma.user.findUnique({where: {email}, include: {Student: true}})
-            if(!user || user.password !== password){
-                return {
-                    success: false,
-                    message: "Incorrect username or password",
-                    token: null,
-                }
+            const result = await context.authService.login(email, password);
+
+            if(result.success && result.refreshToken){
+                context.res.cookies.set("refreshToken", result.refreshToken, {
+                    httpOnly: true, //anti XSS (Cross-Site Scripting)
+                    secure: true, //https :>
+                    sameSite: 'strict', //anti CSRF deymm
+                    path: "/api/graphql",
+                    maxAge: 60 * 60 * 24 * 7
+                });
             }
 
-            const token = jwt.sign(
-                {
-                    userId: user.id,
-                    role: "STUDENT",
-                    studentId: user.Student?.id.toString()
-                },
-                process.env.ACCESS_TOKEN_SECRET!,
-                {
-                    expiresIn: "7d",
-                }
-            );
-
             return {
-                success: true,
-                message: "Successfully created token",
-                token, 
+                success: result.success,
+                messsage: result.message,
+                token: result.accessToken
             }
         },
     }

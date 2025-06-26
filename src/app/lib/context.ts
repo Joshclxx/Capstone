@@ -1,17 +1,14 @@
 import {PrismaClient} from "@prisma/client"
 import { prisma } from "./prisma"
-import { NextRequest } from "next/server";
-import jwt, { TokenExpiredError } from "jsonwebtoken"
+import { NextRequest, NextResponse } from "next/server";
+import  { TokenExpiredError } from "jsonwebtoken"
+import { verifyAccessToken } from "../services/jwtUtils";
+import { AuthService } from "../services/authService";
 
 
 interface JwtPayload {
     userId: string;
     role: "ADMIN" | "REGISTRAR" | "TEACHER" | "STUDENT"
-    // attributes?: Record<string, string> //ABAC 
-    studentId?: number;
-    teacherId?: number;
-    registrarId?: number;
-    adminId?: string;
 }
 
 export type GraphQLContext = {
@@ -19,38 +16,37 @@ export type GraphQLContext = {
     // attributes?: Record<string, string> //ABAC 
     role?: JwtPayload["role"];
     userId?: string;
-    studentId?: number;
-    teacherId?: number;
-    registrarId?: number;
-    adminId?: string;
+    authService: AuthService;
     tokenExpired?: boolean;
+    res: NextResponse
 }
 
-export async function createContext(req: NextRequest): Promise<GraphQLContext> {
+const authService = new AuthService(prisma)
+
+export async function createContext(req: NextRequest, res: NextResponse): Promise<GraphQLContext> {
     const authHeader = req.headers.get("authorization");
     const token = authHeader?.split(" ")[1];
     if(!token){
         console.log("No token provided");
-        return {prisma}
+        return {prisma, authService, res}
     }
 
     try {
-        const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!) as JwtPayload;
+        const decoded = await verifyAccessToken(token)
         console.log("Token Decoded:", decoded);
         return {
             prisma,
             userId: decoded.userId,
             role: decoded.role,
-            adminId: decoded.adminId,
-            teacherId: decoded.teacherId,
-            studentId: decoded.studentId,
+            authService,
+            res,
         }
 
     } catch (err) {
         if(err instanceof TokenExpiredError){
-            return {prisma, tokenExpired: true}
+            return {prisma, authService, res, tokenExpired: true}
         }
         console.error("JWT Verification failed", err);
-        return {prisma}
+        return {prisma, authService, res}
     }
 }
