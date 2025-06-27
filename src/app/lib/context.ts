@@ -1,6 +1,6 @@
 import {PrismaClient} from "@prisma/client"
 import { prisma } from "./prisma"
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import  { TokenExpiredError } from "jsonwebtoken"
 import { verifyAccessToken } from "../services/jwtUtils";
 import { AuthService } from "../services/authService";
@@ -18,17 +18,16 @@ export type GraphQLContext = {
     userId?: string;
     authService: AuthService;
     tokenExpired?: boolean;
-    res: NextResponse
 }
 
 const authService = new AuthService(prisma)
 
-export async function createContext(req: NextRequest, res: NextResponse): Promise<GraphQLContext> {
+export async function createContext(req: NextRequest): Promise<GraphQLContext> {
     const authHeader = req.headers.get("authorization");
     const token = authHeader?.split(" ")[1];
     if(!token){
         console.log("No token provided");
-        return {prisma, authService, res}
+        return {prisma, authService}
     }
 
     try {
@@ -39,14 +38,13 @@ export async function createContext(req: NextRequest, res: NextResponse): Promis
             userId: decoded.userId,
             role: decoded.role,
             authService,
-            res,
         }
 
     } catch (err) {
         if(err instanceof TokenExpiredError){
-            return {prisma, authService, res, tokenExpired: true}
+            return {prisma, authService, tokenExpired: true}
         }
         console.error("JWT Verification failed", err);
-        return {prisma, authService, res}
+        return {prisma, authService}
     }
 }

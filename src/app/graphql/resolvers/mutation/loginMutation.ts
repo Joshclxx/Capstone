@@ -1,5 +1,6 @@
 import { GraphQLContext } from "@/app/lib/context";
 import { GraphQLError } from "graphql";
+import { cookies } from "next/headers";
 
 
 export const loginMutation = {
@@ -12,20 +13,14 @@ export const loginMutation = {
                 const result = await context.authService.login(email, password);
 
                 if(result.success && result.refreshToken){
-                    context.res.cookies.set("refreshToken", result.refreshToken, {
-                        httpOnly: true, //anti XSS (Cross-Site Scripting)
-                        secure: true, //https :>
-                        sameSite: 'strict', //anti CSRF deymm
-                        path: "/api/graphql",
-                        maxAge: 60 * 60 * 24 * 7
+                    (await cookies()).set("refreshToken", result.refreshToken, {
+                    httpOnly: true, //anti XSS
+                    sameSite: "strict", //anti CSRF
+                    secure: true, //https
+                    maxAge: 60 * 60 * 24 * 7, //7days :>
+                    path: "/api/graphql",
                     });
                 }
-
-                for (const [key, value] of context.res.headers.entries()) {
-    if (key.toLowerCase() === "set-cookie") {
-        console.log("Set-Cookie header:", value);
-    }
-}
 
                 return {
                     success: result.success,
