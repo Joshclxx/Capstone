@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt"
 import { createAccessToken, createRefreshToken } from "./jwtUtils";
+import { JwtPayload } from "../lib/context";
 
 
 export class AuthService {
@@ -8,6 +9,7 @@ export class AuthService {
 
     async login (email: string, password: string) {
         const user = await this.prisma.user.findUnique({where: {email}});
+        console.log(user?.email, user?.password)
         if(!user || !await bcrypt.compare(password, user.password)) {
             return {
                 success: false,
@@ -19,7 +21,7 @@ export class AuthService {
 
         const payload = {
             userId: user.id,
-            role: user.role
+            role: user.role as JwtPayload["role"]
         }
         const refreshToken = createRefreshToken(payload)
         const accessToken = createAccessToken(payload);

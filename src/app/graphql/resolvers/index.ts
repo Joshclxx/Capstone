@@ -3,7 +3,7 @@ import { studentQuery } from "./query/studentQuery"
 
 export const resolvers = {
     Query: {
-        ...studentQuery.Query
+        // ...studentQuery.Query
     },
     Mutation: {
         ...loginMutation.Mutation
