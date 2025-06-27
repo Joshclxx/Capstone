@@ -6,7 +6,7 @@ import { verifyAccessToken } from "../services/jwtUtils";
 import { AuthService } from "../services/authService";
 
 
-interface JwtPayload {
+export interface JwtPayload {
     userId: string;
     role: "ADMIN" | "REGISTRAR" | "TEACHER" | "STUDENT"
 }

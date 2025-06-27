@@ -24,4 +24,8 @@ export const userTypeDefs = gql`
     teacher
     student
   }
+
+  type Query {
+    _query: String
+  }
 `

@@ -1,4 +1,4 @@
-import { JwtPayload } from "jsonwebtoken";
+import { JwtPayload } from "../lib/context";
 import jwt from "jsonwebtoken"
 
 const accessToken = process.env.ACCESS_TOKEN_SECRET!
