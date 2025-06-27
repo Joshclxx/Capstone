@@ -3,12 +3,14 @@
 import SectionContainer from "@/components/SectionContainer";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import { LOGIN } from "./clientRequest/mutation/loginReq";
+import { useMutation } from "@apollo/client";
 
 export default function LoginPage() {
   const router = useRouter();
   const [form, setForm] = useState({ username: "", password: "" });
   const [error, setError] = useState("");
-
+  const [login] = useMutation(LOGIN)
   const users = [
     { username: "admin", password: "admin123", role: "admin" },
     { username: "teacher", password: "teacher123", role: "teacher" },
@@ -19,18 +21,31 @@ export default function LoginPage() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const foundUser = users.find(
-      (user) =>
-        user.username === form.username && user.password === form.password
-    );
+    // const foundUser = users.find(
+    //   (user) =>
+    //     user.username === form.username && user.password === form.password
+    // );
 
-    if (foundUser) {
-      router.push(`/${foundUser.role}`);
-    } else {
-      setError("Invalid username or password");
+    // if (foundUser) {
+    //   router.push(`/${foundUser.role}`);
+    // } else {
+    //   setError("Invalid username or password");
+    // }
+    //comment ko lang muna Josh pang testing
+    try {
+      await login({variables: {
+        data: {
+          email: form.username,
+          password: form.password
+        }
+      }})
+      console.log(`success`)
+    } catch (err) {
+      console.error(err)
     }
+
   };
 
   return (
