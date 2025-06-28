@@ -1,6 +1,12 @@
 import { JwtPayload } from "../lib/context";
 import jwt from "jsonwebtoken"
 
+type JwtPayloadWithClaims = JwtPayload & {
+    exp?: number;
+    iat?: number;
+    nbf?: number;
+};
+
 const accessToken = process.env.ACCESS_TOKEN_SECRET!
 const refreshToken = process.env.REFRESH_TOKEN_SECRET!
 
@@ -10,6 +16,14 @@ export function createAccessToken (payload: JwtPayload){
 
 export function createRefreshToken (payload: JwtPayload){
     return jwt.sign(payload, refreshToken, {expiresIn: "7d"});
+}
+
+export function stripTokenClaims(payload: JwtPayloadWithClaims): JwtPayload {
+    const cleanPayload = {
+        userId: payload.userId,
+        role: payload.role
+    };
+    return cleanPayload
 }
 
 export function verifyAccessToken (token: string) {

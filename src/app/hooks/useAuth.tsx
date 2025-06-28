@@ -3,18 +3,8 @@ import { useAuthStore } from "../store/authStore";
 // import { useRouter } from "next/router"; // comment ko muna habang wala pang logout 
 import { setAccessToken } from "../lib/token";
 import { decodeToken } from "../services/jwtUtils";
-import { GraphQLError } from "graphql";
-
-interface refreshToken {
-    refreshToken: {
-        accessToken: string
-    }
-}
-
-interface GraphQLResponse  {
-    data?: refreshToken,
-    errors: GraphQLError[]
-}
+import { refreshAccessToken } from "../lib/refreshAccessToken";
+import { usePathname } from "next/navigation";
 
 export function useAuth () {
     const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -24,49 +14,43 @@ export function useAuth () {
     const resetAuth = useAuthStore((state) => state.resetAuth);
     const [loading, setLoading] = useState(true);
     // const router = useRouter();
+    const pathname = usePathname()
 
     useEffect(() => {
-        const silentFart = async () => { //HAHAHAHAHAHAHAHAHA 
+        const silentFart = async () => {
             try {
-                const res = await fetch("/api/graphql", {
-                    method: "POST",
-                    credentials: "include",
-                    headers: {"Content-Type": "application/json"},
-                    body: JSON.stringify({
-                        query: `mutation { refreshToken {accessToken } }`,
-                    }),
-                });
+                const accessToken = await refreshAccessToken();
 
-                const json: GraphQLResponse = await res.json();
-                if(json.errors?.some(err => err.extensions?.code === "REFRESH_TOKEN_EXPIRED")) {
-                    console.log("Refresh token expired. Forcing logout bitch!");
-                    setAccessToken("");
-                    resetAuth();
-                    return
-                } 
-
-                const token = json?.data?.refreshToken?.accessToken;
-                if(token){
-                    const payload = decodeToken(token);
-                    setRole(payload?.role)
-                    setAccessToken(token);
-                    setIsAuthenticated(true)
+                if (accessToken) {
+                    const payload = decodeToken(accessToken);
+                    setRole(payload?.role);
+                    setAccessToken(accessToken);
+                    setIsAuthenticated(true);
                 } else {
                     setAccessToken("");
-                    resetAuth()
+                    resetAuth();
                 }
             } catch (err) {
-                console.error("Silent Refresh failed", err); //ito muna habang wala pang toast
+                if (
+                    err instanceof Error &&
+                    err.message === "No refresh token provided" &&
+                    pathname === "/login"
+                ) {
+                    setAccessToken("");
+                    resetAuth();
+                    console.log("Im here")
+                    return;
+                }
+
+                console.error("Silent Refresh failed", err);
                 setAccessToken("");
                 resetAuth();
             } finally {
-                setLoading(false)
+                setLoading(false);
             }
-
         };
 
-        silentFart()
-    
+        silentFart();
     }, [setIsAuthenticated, setRole, resetAuth]);
 
     return {isAuthenticated, role, loading}

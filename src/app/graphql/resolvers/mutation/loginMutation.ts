@@ -18,13 +18,13 @@ export const loginMutation = {
                     sameSite: "strict", //anti CSRF
                     secure: true, //https
                     maxAge: 60 * 60 * 24 * 7, //7days :>
-                    path: "/api/graphql",
+                    path: "/api/refresh-token",
                     });
                 }
 
                 return {
                     success: result.success,
-                    message: result.message ?? "",
+                    message: result.message,
                     token: result.accessToken
                 }
             }
