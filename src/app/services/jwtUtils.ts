@@ -13,9 +13,27 @@ export function createRefreshToken (payload: JwtPayload){
 }
 
 export function verifyAccessToken (token: string) {
-    return jwt.verify(token, accessToken) as JwtPayload;
+    try {
+        return jwt.verify(token, accessToken) as JwtPayload;
+    } catch (err) {
+        console.error("JWT Verification error:", err);
+        throw err; 
+    }
 }
 
 export function verifyRefreshToken (token: string) {
-    return jwt.verify(token, refreshToken) as JwtPayload;
+    try {
+        return jwt.verify(token, refreshToken) as JwtPayload;
+    } catch (err) {
+        console.error("JWT Verification error:", err);
+        throw err; 
+    }
+}
+
+export function decodeToken (token: string) {
+    const decodedToken = jwt.decode(token) as JwtPayload | null;
+    if(!decodedToken){
+        console.error("JWT Decoding returned null. Possibly malformed token.");
+    }
+    return decodedToken;
 }

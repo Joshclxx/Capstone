@@ -1,6 +1,7 @@
 import { ApolloClient, InMemoryCache, HttpLink, ApolloLink, from, Observable} from '@apollo/client';
 import { getAccessToken, setAccessToken } from './token';
 import {onError} from "@apollo/client/link/error"
+import { GraphQLError } from 'graphql';
 
 //Midleware i hiwalay sa ibang files kapag dumami
 const authLink = new ApolloLink((operation, forward) => {
@@ -30,7 +31,13 @@ const errorLink = onError(({graphQLErrors, operation, forward}) => {
                 }),
             })
             .then(res => res.json())
-            .then(({data}) => {
+            .then(({data, errors} : {data?: {refreshToken: {accessToken: string}}, errors: GraphQLError[]}) => {
+                if (errors?.some(err => err.extensions.code === "REFRESH_TOKEN_EXPIRED")) {
+                    setAccessToken("");
+                    window.location.href = "/login" //palitan nalang kung saan nakalagay login
+                    return
+                }
+
                 const newAccessToken = data?.refreshToken?.accessToken;
                 if(!newAccessToken) throw new Error('No token');
                 setAccessToken(newAccessToken);
@@ -42,9 +49,12 @@ const errorLink = onError(({graphQLErrors, operation, forward}) => {
                     }
                 }));
 
-                return forward(operation).subscribe(observer)
+                return forward(operation).subscribe(observer) //retry the original request.
             })
-            .catch(observer.error)
+            .catch(err => {
+                console.error("Apollo errorLink refresh error:", err);
+                observer.error(err)
+            })
         })
     }
 

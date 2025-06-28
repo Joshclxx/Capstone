@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import ApolloWrapper from "./apolloWrapper";
+import ApolloWrapper from "./lumpiaWrapper/apolloWrapper";
+import { AuthProvider } from "./lumpiaWrapper/authWrapper";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,10 +29,14 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen`}
       >
-        <ApolloWrapper>{children}</ApolloWrapper>
+        <ApolloWrapper>
+          <AuthProvider> {/* Lumpia Wrapper*/}
+            {children}
+          </AuthProvider>
+        </ApolloWrapper>
       </body>
     </html>
   );
 }
 
-//Josh lahat ng components na irerender mo i pasok mo sa loob ng apolloWrapper
+//Josh lahat ng components na irerender mo i pasok mo sa loob ng AuthProvider

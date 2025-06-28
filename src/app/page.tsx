@@ -4,18 +4,22 @@ import SectionContainer from "@/components/SectionContainer";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { LOGIN } from "./clientRequest/mutation/loginReq";
-import { useMutation } from "@apollo/client";
+import { useMutation, useLazyQuery } from "@apollo/client";
+import { USERS_QUERY } from "./clientRequest/query/usersReq";
+import { setAccessToken } from "./lib/token";
+import { useAuth } from "./hooks/useAuth";
 
 export default function LoginPage() {
   const router = useRouter();
   const [form, setForm] = useState({ username: "", password: "" });
   const [error, setError] = useState("");
-  const [login] = useMutation(LOGIN)
-  const users = [
-    { username: "admin", password: "admin123", role: "admin" },
-    { username: "teacher", password: "teacher123", role: "teacher" },
-    { username: "student", password: "student123", role: "student" },
-  ];
+  const [login] = useMutation(LOGIN) //testing
+  const [getAllUsers] = useLazyQuery(USERS_QUERY) //testing
+  // const users = [
+  //   { username: "admin", password: "admin123", role: "admin" },
+  //   { username: "teacher", password: "teacher123", role: "teacher" },
+  //   { username: "student", password: "student123", role: "student" },
+  // ]; 
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -35,13 +39,23 @@ export default function LoginPage() {
     // }
     //comment ko lang muna Josh pang testing
     try {
-      await login({variables: {
+      const {data} = await login({variables: {
         data: {
           email: form.username,
           password: form.password
         }
-      }})
-      console.log(`success`)
+      }});
+
+      const token = data?.login?.token;
+      if(!token) {
+        setError("No access token returned. Check the fking server");
+        return
+      }
+      setAccessToken(token)
+
+      const {data: userData} = await getAllUsers()
+      console.log(userData)
+
     } catch (err) {
       console.error(err)
     }

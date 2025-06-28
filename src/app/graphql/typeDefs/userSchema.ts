@@ -17,15 +17,19 @@ export const userTypeDefs = gql`
     Student: Student
   }
 
-
   enum Role {
-    admin
-    registrar
-    teacher
-    student
+    ADMIN
+    TEACHER
+    STUDENT
   }
 
   type Query {
-    _query: String
+    getAllUsers: UserOperationResponse!
+  }
+
+  type UserOperationResponse {
+    success: Boolean,
+    message: String,
+    data: [User!]!
   }
 `
