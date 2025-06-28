@@ -1,11 +1,13 @@
 import { loginMutation } from "./mutation/loginMutation"
-import { studentQuery } from "./query/studentQuery"
+import { refreshTokenMutation } from "./mutation/refreshToken"
+import { usersQuery } from "./query/usersQuery"
 
 export const resolvers = {
     Query: {
-        // ...studentQuery.Query
+        ...usersQuery.Query
     },
     Mutation: {
-        ...loginMutation.Mutation
+        ...loginMutation.Mutation,
+        ...refreshTokenMutation.Mutation
     }
 }
