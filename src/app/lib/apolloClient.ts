@@ -1,7 +1,7 @@
 import { ApolloClient, InMemoryCache, HttpLink, ApolloLink, from, Observable} from '@apollo/client';
 import { getAccessToken, setAccessToken } from './token';
 import {onError} from "@apollo/client/link/error"
-import { GraphQLError } from 'graphql';
+import { refreshAccessToken } from './refreshAccessToken';
 
 //Midleware i hiwalay sa ibang files kapag dumami
 const authLink = new ApolloLink((operation, forward) => {
@@ -22,39 +22,25 @@ const authLink = new ApolloLink((operation, forward) => {
 const errorLink = onError(({graphQLErrors, operation, forward}) => {
     if(graphQLErrors?.some(err => err.extensions?.code === "UNAUTHENTICATED")) {
         return new Observable(observer => {
-            fetch('/api/graphql', {
-                method: "POST",
-                credentials: 'include',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    query: `mutation {refreshToken {accessToken}}`,
-                }),
-            })
-            .then(res => res.json())
-            .then(({data, errors} : {data?: {refreshToken: {accessToken: string}}, errors: GraphQLError[]}) => {
-                if (errors?.some(err => err.extensions.code === "REFRESH_TOKEN_EXPIRED")) {
-                    setAccessToken("");
-                    window.location.href = "/login" //palitan nalang kung saan nakalagay login
-                    return
-                }
-
-                const newAccessToken = data?.refreshToken?.accessToken;
-                if(!newAccessToken) throw new Error('No token');
+            refreshAccessToken() 
+            .then(newAccessToken => {
                 setAccessToken(newAccessToken);
 
-                operation.setContext(({ headers = {}}) => ({
+                operation.setContext(({headers = {}}) => ({
                     headers: {
                         ...headers,
                         Authorization: `Bearer ${newAccessToken}`,
-                    }
+                    },
                 }));
 
-                return forward(operation).subscribe(observer) //retry the original request.
+                forward(operation).subscribe(observer);
+
             })
             .catch(err => {
-                console.error("Apollo errorLink refresh error:", err);
+                console.error(err);
                 observer.error(err)
             })
+            
         })
     }
 
