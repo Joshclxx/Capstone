@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { ApolloProvider } from '@apollo/client';
 import client from '@/app/lib/apolloClient';

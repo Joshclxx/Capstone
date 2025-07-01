@@ -14,6 +14,6 @@ export async function refreshAccessToken() {
 
         return json.accessToken as string;
     } catch (err) {
-        throw err;
+        throw err; //double it and pass it to the next person
     }
 }

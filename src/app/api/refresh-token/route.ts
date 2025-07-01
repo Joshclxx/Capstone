@@ -1,4 +1,3 @@
-
 import { createAccessToken, createRefreshToken, stripTokenClaims, verifyRefreshToken } from "@/app/services/jwtUtils";
 import { cookies } from "next/headers"
 import { NextResponse } from "next/server";
@@ -9,7 +8,7 @@ export async function POST(){
         if(!refreshToken){
             return NextResponse.json({error: "No refresh token provided"}, {status: 401});
         }
-        
+
         const cleanPayload = stripTokenClaims(verifyRefreshToken(refreshToken))
         const newAccessToken = createAccessToken(cleanPayload);
         const newRefreshToken = createRefreshToken(cleanPayload);

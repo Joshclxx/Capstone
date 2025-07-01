@@ -8,7 +8,8 @@ export function AuthProvider ({
     children : React.ReactNode
 }) {
     const {loading} = useAuth();
-    if (loading) {
+
+    if (loading )    {
         return <div>loading...</div> //palitan ng loading animation kung kaya
     }
 

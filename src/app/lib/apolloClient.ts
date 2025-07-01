@@ -25,7 +25,6 @@ const errorLink = onError(({graphQLErrors, operation, forward}) => {
             refreshAccessToken() 
             .then(newAccessToken => {
                 setAccessToken(newAccessToken);
-
                 operation.setContext(({headers = {}}) => ({
                     headers: {
                         ...headers,
