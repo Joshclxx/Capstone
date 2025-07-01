@@ -1,7 +1,8 @@
+
 import { useEffect, useState } from "react";
 import { useAuthStore } from "../store/authStore";
-// import { useRouter } from "next/router"; // comment ko muna habang wala pang logout 
-import { setAccessToken } from "../lib/token";
+import { useRouter } from "next/navigation"; 
+import { getAccessToken, setAccessToken } from "../lib/token";
 import { decodeToken } from "../services/jwtUtils";
 import { refreshAccessToken } from "../lib/refreshAccessToken";
 import { usePathname } from "next/navigation";
@@ -13,23 +14,30 @@ export function useAuth () {
     const setRole = useAuthStore((state) => state.setRole);
     const resetAuth = useAuthStore((state) => state.resetAuth);
     const [loading, setLoading] = useState(true);
-    // const router = useRouter();
+    const router = useRouter();
     const pathname = usePathname()
 
     useEffect(() => {
         const silentFart = async () => {
             try {
-                const accessToken = await refreshAccessToken();
+
+                let accessToken = getAccessToken();
+
+                if(!accessToken) {
+                    accessToken = await refreshAccessToken();
+                    setAccessToken(accessToken);
+                }   
 
                 if (accessToken) {
                     const payload = decodeToken(accessToken);
                     setRole(payload?.role);
-                    setAccessToken(accessToken);
                     setIsAuthenticated(true);
                 } else {
+                    //playsafe :D
                     setAccessToken("");
                     resetAuth();
                 }
+
             } catch (err) {
                 if (
                     err instanceof Error &&
@@ -38,11 +46,11 @@ export function useAuth () {
                 ) {
                     setAccessToken("");
                     resetAuth();
-                    console.log("Im here")
+                    console.log("TESTING ")
                     return;
                 }
 
-                console.error("Silent Refresh failed", err);
+                // router.replace("/login")
                 setAccessToken("");
                 resetAuth();
             } finally {
@@ -51,7 +59,7 @@ export function useAuth () {
         };
 
         silentFart();
-    }, [setIsAuthenticated, setRole, resetAuth]);
+    }, [setIsAuthenticated, setRole, resetAuth, pathname, router]);
 
     return {isAuthenticated, role, loading}
 }

@@ -9,7 +9,7 @@ export class AuthService {
 
     async login (email: string, password: string) {
         const user = await this.prisma.user.findUnique({where: {email}});
-        console.log(user?.email, user?.password)
+
         if(!user || !await bcrypt.compare(password, user.password)) {
             return {
                 success: false,

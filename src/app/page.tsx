@@ -5,14 +5,14 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { LOGIN } from "./clientRequest/mutation/loginReq";
 import { useMutation } from "@apollo/client";
-import { setAccessToken } from "./lib/token";
+import { getAccessToken, setAccessToken } from "./lib/token";
 import { useAuth } from "./hooks/useAuth";
 
 export default function LoginPage() {
   const router = useRouter();
   const [form, setForm] = useState({ username: "", password: "" });
   const [error, setError] = useState("");
-  const [login] = useMutation(LOGIN) //testing
+  const [login, {loading}] = useMutation(LOGIN) //testing
   // const users = [
   //   { username: "admin", password: "admin123", role: "admin" },
   //   { username: "teacher", password: "teacher123", role: "teacher" },
@@ -36,6 +36,7 @@ export default function LoginPage() {
     //   setError("Invalid username or password");
     // }
     //comment ko lang muna Josh pang testing
+    
     try {
       const {data} = await login({variables: {
         data: {
@@ -50,6 +51,7 @@ export default function LoginPage() {
         return;
       }
       setAccessToken(token)
+      console.log(getAccessToken())
     } catch (err) {
       console.error(err)
     }
